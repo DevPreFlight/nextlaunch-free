@@ -1,0 +1,15 @@
+# NextLaunch Pro Cursor IDE Rules
+
+You are working on NextLaunch Pro, an enterprise-grade full-stack SaaS boilerplate built with:
+- Next.js 16 (App Router with Turbopack)
+- React 19 (Server Actions, Optimistic updates)
+- TypeScript (Strict mode, zero `any` types)
+- Tailwind CSS (PreFlight Flat White & Blue Design System)
+- Polar Merchant of Record SDK & Subscriptions
+- Prisma ORM with PostgreSQL / SQLite
+
+## Guidelines
+1. Always keep server logic and client logic cleanly separated. Use `'use client'` only when state, event handlers, or browser APIs are needed.
+2. Use `@/lib/db` for database queries and `@/lib/polar` for billing logic.
+3. Adhere to the DevPreFlight flat UI design tokens: avoid generic colors, use crisp high-contrast white & blue tokens (`bg-white`, `border-slate-200`, `text-slate-900`, `bg-blue-600`).
+4. Keep all components accessible (WCAG AAA compliant).

@@ -1,0 +1,51 @@
+{
+  "name": "nextlaunch-free",
+  "version": "1.0.0",
+  "private": false,
+  "description": "NextLaunch Free Community Starter - Open Source Next.js 16 & React 19 Starter Kit",
+  "author": "DevPreFlight Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DevPreFlight/nextlaunch-free.git"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@polar-sh/sdk": "^0.49.0",
+    "@prisma/adapter-pg": "6.12.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.45.0",
+    "next": "16.3.5",
+    "pg": "^8.23.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.4"
+  },
+  "devDependencies": {
+    "@prisma/client": "6.12.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.5",
+    "prisma": "6.12.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.13",
+    "typescript": "^5"
+  }
+}

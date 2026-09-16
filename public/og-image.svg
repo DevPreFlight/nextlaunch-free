@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="ogBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="brandGradOG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="88%" cy="18%" r="65%">
+      <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#f8fafc" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#ogBg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  
+  <!-- Top Brand Row -->
+  <g transform="translate(80, 65)">
+    <!-- Logo Box -->
+    <rect width="72" height="72" rx="18" fill="url(#brandGradOG)"/>
+    <g transform="translate(16, 16) scale(1.66)" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      <path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-1.5 5-1.5"/>
+      <path d="M12 15v5s3.03-.55 4.5-2c1.63-1.62 1.5-5 1.5-5"/>
+    </g>
+    
+    <text x="94" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="800" font-size="38" fill="#0f172a" letter-spacing="-1.5px">NextLaunch</text>
+    <text x="320" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="800" font-size="38" fill="#2563eb" letter-spacing="-1.5px">Pro</text>
+    
+    <!-- Live Demo Badge -->
+    <g transform="translate(830, 10)">
+      <rect width="210" height="42" rx="21" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+      <circle cx="24" cy="21" r="6" fill="#2563eb"/>
+      <text x="42" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="700" font-size="15" fill="#1d4ed8">Interactive Live Demo</text>
+    </g>
+  </g>
+  
+  <!-- Main Heading -->
+  <text x="80" y="235" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="800" font-size="52" fill="#0f172a" letter-spacing="-2px">
+    Enterprise Full-Stack SaaS
+  </text>
+  <text x="80" y="300" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="800" font-size="52" fill="#2563eb" letter-spacing="-2px">
+    Boilerplate &amp; Starter Kit
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="80" y="375" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="500" font-size="23" fill="#475569">
+    Next.js 16 • React 19 • Dual Stripe &amp; Polar Billing • Multi-Tenant RBAC • 60+ UI Kit
+  </text>
+  
+  <!-- Feature Badges -->
+  <g transform="translate(80, 460)">
+    <!-- Badge 1: Next.js 16 -->
+    <g transform="translate(0, 0)">
+      <rect width="180" height="52" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+      <text x="90" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="700" font-size="16" fill="#0f172a" text-anchor="middle">⚡ Next.js 16 </text>
+    </g>
+    <!-- Badge 2: Dual Billing -->
+    <g transform="translate(200, 0)">
+      <rect width="210" height="52" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+      <text x="105" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="700" font-size="16" fill="#0f172a" text-anchor="middle">💳 Stripe &amp; Polar MoR</text>
+    </g>
+    <!-- Badge 3: Multi-Tenant Workspaces -->
+    <g transform="translate(430, 0)">
+      <rect width="210" height="52" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+      <text x="105" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="700" font-size="16" fill="#0f172a" text-anchor="middle">👥 Multi-Tenant RBAC</text>
+    </g>
+    <!-- Badge 4: Flat UI Kit -->
+    <g transform="translate(660, 0)">
+      <rect width="180" height="52" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+      <text x="90" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="700" font-size="16" fill="#0f172a" text-anchor="middle">✨ 60+ Flat UI Kit</text>
+    </g>
+    <!-- Badge 5: Prisma ORM -->
+    <g transform="translate(860, 0)">
+      <rect width="180" height="52" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#cardShadow)"/>
+      <text x="90" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="700" font-size="16" fill="#0f172a" text-anchor="middle">🗄️ Prisma 7 ORM</text>
+    </g>
+  </g>
+</svg>
