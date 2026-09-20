@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Terminal,
   ExternalLink,
-  ChevronDown,
   Layers,
   Code2,
   Zap,
@@ -27,233 +26,208 @@ import {
   Server,
   Sparkles,
   CheckCheck,
-  X
+  FolderTree,
+  BookOpen,
+  Settings,
+  Activity,
+  Play
 } from 'lucide-react';
 
 export default function HomePage() {
-  const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
-  const [activeCliTab, setActiveCliTab] = useState<'npx' | 'pnpm' | 'bun'>('npx');
-  const [activeSandboxTab, setActiveSandboxTab] = useState<'billing' | 'webhooks' | 'audit' | 'totp'>('billing');
-  const [billingProvider, setBillingProvider] = useState<'stripe' | 'polar'>('stripe');
-  const [totpCode, setTotpCode] = useState('849201');
-  const [webhookPayloadEvent, setWebhookPayloadEvent] = useState('subscription.created');
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'endpoints' | 'structure' | 'env' | 'scripts'>('endpoints');
+  const [activeSandboxTab, setActiveSandboxTab] = useState<'webhooks' | 'auth' | 'audit' | 'billing'>('webhooks');
+  const [webhookEvent, setWebhookEvent] = useState('subscription.created');
+  const [totpCode, setTotpCode] = useState('742819');
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedCmd(id);
-    setTimeout(() => setCopiedCmd(null), 2500);
+    setCopiedSnippet(id);
+    setTimeout(() => setCopiedSnippet(null), 2500);
   };
 
-  const cliCommands = {
-    npx: 'npx @devpreflight/nextlaunch init my-saas-app',
-    pnpm: 'pnpm dlx @devpreflight/nextlaunch init my-saas-app',
-    bun: 'bunx @devpreflight/nextlaunch init my-saas-app',
-  };
-
-  const coreModules = [
+  const localEndpoints = [
     {
-      id: 'billing',
+      method: 'POST',
+      path: '/api/webhooks/outgoing',
+      description: 'Dispatches signed outgoing webhooks with Standard Webhooks HMAC-SHA256 signature.',
+      category: 'Webhooks',
+    },
+    {
+      method: 'GET',
+      path: '/api/audit-logs',
+      description: 'Fetches compliance audit event trail with actor attribution and metadata diffs.',
+      category: 'Audit',
+    },
+    {
+      method: 'POST',
+      path: '/api/auth/2fa',
+      description: 'Generates RFC 6238 TOTP QR secrets and single-use 8-digit hashed backup recovery codes.',
+      category: 'Security',
+    },
+    {
+      method: 'POST',
+      path: '/api/auth/sessions',
+      description: 'Multi-device session manager with remote revocation and IP tracking.',
+      category: 'Auth',
+    },
+    {
+      method: 'POST',
+      path: '/api/ai/chat',
+      description: 'Google GenAI SDK 2.x streaming LLM copilot endpoint with structured output.',
+      category: 'AI',
+    },
+    {
+      method: 'POST',
+      path: '/api/webhooks/stripe',
+      description: 'Idempotent Stripe webhook receiver for invoice.paid, customer.subscription events.',
+      category: 'Billing',
+    },
+    {
+      method: 'POST',
+      path: '/api/webhooks/polar',
+      description: 'Polar.sh Merchant of Record webhook receiver with cryptographic Svix signatures.',
+      category: 'Billing',
+    },
+    {
+      method: 'GET',
+      path: '/admin',
+      description: 'Super Admin Control Center with user inspection & 1-click user impersonation.',
+      category: 'Admin Portal',
+    },
+  ];
+
+  const quickSteps = [
+    {
+      step: '01',
+      title: 'Configure Environment Variables',
+      desc: 'Copy the sample environment configuration to activate your local database and API credentials.',
+      code: 'cp .env.example .env.local',
+      action: 'copy',
+    },
+    {
+      step: '02',
+      title: 'Setup Database & Prisma Client',
+      desc: 'Run database migrations and seed default development roles and demo workspaces.',
+      code: 'npx prisma migrate dev && npm run db:seed',
+      action: 'copy',
+    },
+    {
+      step: '03',
+      title: 'Run Automated Test Suite',
+      desc: 'Verify that HMAC signing, RBAC security guards, and billing adapters pass all 49 unit tests.',
+      code: 'npm test',
+      action: 'copy',
+    },
+    {
+      step: '04',
+      title: 'Inspect Database via Prisma Studio',
+      desc: 'Launch local graphical database manager on localhost:5555 to explore multi-tenant records.',
+      code: 'npx prisma studio',
+      action: 'copy',
+    },
+  ];
+
+  const subsystems = [
+    {
       icon: CreditCard,
       title: 'Dual Billing Engine',
-      subtitle: 'Stripe Subscriptions & Polar.sh MoR',
-      description: 'Zero-lock-in payment architecture with unified customer portal, webhook reconciliation, and subscription state machines.',
-      badge: 'Stripe + Polar',
-      tag: 'Monetization',
-      metrics: '2 Providers Built-in',
+      subtitle: 'Stripe Subscriptions + Polar MoR',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Multi-provider payment adapters with customer portal redirect, subscription state sync, and webhook handlers.',
+      path: 'src/services/billing.service.ts',
     },
     {
-      id: 'webhooks',
       icon: Webhook,
       title: 'Outgoing Webhooks Engine',
-      subtitle: 'Standard Webhooks v1 (HMAC-SHA256)',
-      description: 'Enterprise webhook dispatching engine with cryptographic signatures, fan-out event distribution, and automatic retry queues.',
-      badge: 'HMAC-SHA256',
-      tag: 'Infrastructure',
-      metrics: '5 Automatic Retries',
+      subtitle: 'Standard Webhooks (HMAC-SHA256)',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Cryptographic event signing (webhook-signature: v1,t=...), fan-out queues, and automatic retries.',
+      path: 'src/services/outgoing-webhook.service.ts',
     },
     {
-      id: 'audit',
-      icon: FileSpreadsheet,
-      title: 'Audit Logs & Compliance Trail',
-      subtitle: 'Actor attribution & diff snapshots',
-      description: 'Comprehensive audit trail system tracking actor ID, IP origin, state diff metadata, and one-click compliance CSV/JSON exports.',
-      badge: 'Enterprise Log',
-      tag: 'Security',
-      metrics: 'CSV / JSON Export',
-    },
-    {
-      id: 'totp',
       icon: Lock,
-      title: '2FA TOTP & Session Revocation',
-      subtitle: 'RFC 6238 Authenticator & Recovery Codes',
-      description: 'Two-factor authentication with 8-digit hashed backup recovery codes, active session telemetry, and remote device revocation.',
-      badge: 'RFC 6238 Compliant',
-      tag: 'Security',
-      metrics: '8 Backup Codes',
+      title: '2FA TOTP & Session Security',
+      subtitle: 'RFC 6238 + Backup Codes',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Authenticator OTP tokens, 8-digit hashed backup recovery codes, and multi-device session revocation.',
+      path: 'src/services/two-factor.service.ts',
     },
     {
-      id: 'apikeys',
+      icon: FileSpreadsheet,
+      title: 'Audit Logs & Compliance',
+      subtitle: 'Actor attribution & diff metadata',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Append-only event logger with IP attribution, JSON diffs, and compliance CSV export route.',
+      path: 'src/services/audit-log.service.ts',
+    },
+    {
       icon: KeyRound,
-      title: 'Cryptographic API Key Manager',
-      subtitle: 'SHA-256 hashed secret keys (nl_live_...)',
-      description: 'Scoped API key generation with fast prefix indexing, cryptographic hashing, and automated last-used timestamp telemetry.',
-      badge: 'SHA-256 Hashed',
-      tag: 'Developer Platform',
-      metrics: 'Prefix Fast-Lookup',
+      title: 'API Key Management',
+      subtitle: 'SHA-256 Hashed Keys (nl_live_...)',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Prefix-indexed API secrets, cryptographic verification, and last-used timestamp telemetry.',
+      path: 'src/services/api-key.service.ts',
     },
     {
-      id: 'rbac',
       icon: ShieldCheck,
-      title: 'Multi-Tenant RBAC & Guards',
-      subtitle: 'Cookie sessions & role enforcement',
-      description: 'Strict hierarchical access control (OWNER, ADMIN, MEMBER, VIEWER) protecting Server Actions and API endpoints.',
-      badge: 'Zero-Trust RBAC',
-      tag: 'Auth & Teams',
-      metrics: '4 Strict Roles',
+      title: 'RBAC & Session Guards',
+      subtitle: 'OWNER, ADMIN, MEMBER, VIEWER',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Zero-trust role verification, secure HTTP-only cookie sessions, and Server Action guards.',
+      path: 'src/services/auth.service.ts',
     },
     {
-      id: 'ai',
       icon: Cpu,
       title: 'Gemini GenAI 2.x Copilot',
-      subtitle: 'Streaming LLM workflows & structured JSON',
-      description: 'Google GenAI SDK 2.x integration with prompt token tracking, streaming responses, and schema-validated structured output.',
-      badge: 'Gemini 2.x SDK',
-      tag: 'AI Workflows',
-      metrics: 'Streaming Tokens',
+      subtitle: 'Streaming LLM & Structured JSON',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Google GenAI SDK 2.x streaming copilot, prompt token tracking, and structured output parsing.',
+      path: 'src/app/api/ai/chat/route.ts',
     },
     {
-      id: 'database',
       icon: Database,
-      title: 'Prisma 6 & PostgreSQL',
-      subtitle: 'Multi-tenant relational data models',
-      description: 'Production-ready database migrations, type-safe queries, transactional atomicity, and workspace isolation.',
-      badge: 'PostgreSQL Ready',
-      tag: 'Persistence',
-      metrics: 'Type-Safe ORM',
-    },
-  ];
-
-  const tiers = [
-    {
-      name: 'Free Community',
-      subtitle: 'Open Source Starter',
-      price: '$0',
-      period: 'Forever (MIT)',
-      description: 'Essential full-stack foundation for solo developers and open-source hobby projects.',
-      features: [
-        'Next.js 16 App Router & Turbopack',
-        'React 19 Server Actions architecture',
-        'DevPreFlight Flat UI Component Kit',
-        'Supabase Auth (Email / Password, OAuth)',
-        'Mobile-first responsive layouts',
-        'Cursor & Claude AI agent instructions',
-        'Standard community support',
-      ],
-      ctaText: 'Use Free Community',
-      ctaHref: 'https://github.com/DevPreFlight/nextlaunch-free',
-      isPopular: false,
-      badge: 'MIT Open Source',
-    },
-    {
-      name: 'Standard Pro',
-      subtitle: 'Production SaaS Boilerplate',
-      price: '$99',
-      period: 'one-time payment',
-      description: 'Complete commercial SaaS backend engine with dual billing, security, and AI integrations.',
-      features: [
-        'Everything in Free Community, plus:',
-        'Dual Billing Engine (Stripe + Polar MoR)',
-        'Standard Webhooks Engine (HMAC-SHA256)',
-        'Enterprise Audit Trail & CSV Export',
-        '2FA TOTP & Session Revocation Manager',
-        'Cryptographic API Key Management',
-        'Gemini GenAI 2.x Copilot integration',
-        'Prisma 6 PostgreSQL database schema',
-        'Single commercial product license',
-      ],
-      ctaText: 'Get Standard Edition',
-      ctaHref: 'https://devpreflight.com/nextlaunch',
-      isPopular: true,
-      badge: 'Most Popular for Founders',
-    },
-    {
-      name: 'Agency & Unlimited',
-      subtitle: 'Unlimited Commercial Work',
-      price: '$199',
-      period: 'one-time payment',
-      description: 'Full source rights for SaaS studios, agencies, and prolific founders building multiple ventures.',
-      features: [
-        'Everything in Standard Pro, plus:',
-        'Unlimited client & commercial projects',
-        'Multi-tenant workspace isolation engine',
-        'Customer impersonation banner & tools',
-        'Custom webhook worker templates',
-        'Priority updates & future module releases',
-        'Dedicated founder Discord channel',
-        'Full commercial redistribution for clients',
-      ],
-      ctaText: 'Get Agency Edition',
-      ctaHref: 'https://devpreflight.com/nextlaunch',
-      isPopular: false,
-      badge: 'Unlimited Projects',
-    },
-  ];
-
-  const faqItems = [
-    {
-      question: 'How is NextLaunch different from generic Next.js boilerplates?',
-      answer: 'NextLaunch is engineered as a zero-bloat backend engine paired with the DevPreFlight Flat UI kit. Rather than bloated opinionated mockups, NextLaunch provides real, verified modules: RFC 6238 TOTP 2FA, Standard Webhooks signing with exponential backoffs, cryptographic SHA-256 API key management, dual Stripe and Polar.sh billing, and Gemini AI 2.x streaming with 49 unit tests.',
-    },
-    {
-      question: 'What is the difference between Stripe and Polar.sh in NextLaunch?',
-      answer: 'NextLaunch includes native multi-provider billing adapters. You can use Stripe for traditional merchant account billing or Polar.sh as a Merchant of Record (MoR) to handle global VAT/sales taxes automatically. Switching between them or supporting both requires zero architectural refactoring.',
-    },
-    {
-      question: 'Is the Free Community Edition really free for commercial use?',
-      answer: 'Yes! The Free Community Edition is licensed under the permissive MIT License. You can clone it, modify it, and ship production projects with it. For enterprise modules like Dual Billing, Webhooks Engine, 2FA, Audit Logs, and Gemini AI, you can upgrade to Standard or Agency.',
-    },
-    {
-      question: 'How do I scaffold a project using the CLI?',
-      answer: 'Simply run "npx @devpreflight/nextlaunch init my-saas" in your terminal. The interactive wizard will let you choose your edition (Free, Standard, or Agency), configure your environment, and set up your project in seconds.',
-    },
-    {
-      question: 'Does NextLaunch support Next.js 16 and React 19?',
-      answer: 'Yes, NextLaunch is built from the ground up for Next.js 16 App Router with Turbopack and React 19. It uses modern Server Actions, type-safe route handlers, and Tailwind CSS.',
+      title: 'Prisma 6 PostgreSQL ORM',
+      subtitle: 'Multi-Tenant Relational Schema',
+      status: 'Ready',
+      statusColor: 'emerald',
+      desc: 'Audited PostgreSQL schema, transaction safety, and workspace organization isolation.',
+      path: 'prisma/schema.prisma',
     },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
-      {/* Top Notification Bar */}
-      <div className="bg-slate-900 text-white px-4 py-2 text-xs font-medium flex items-center justify-between border-b border-slate-800">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+      {/* Top Local Status Bar */}
+      <div className="bg-slate-900 text-white px-4 py-2 text-xs font-medium border-b border-slate-800">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-600/30 text-blue-300 font-mono text-[10px] border border-blue-500/40">
-              v1.0.0 Stable
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono text-[11px] border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Local Environment Active
             </span>
-            <span className="text-slate-300 hidden sm:inline">
-              Production Full-Stack SaaS Engine with Next.js 16, React 19 & DevPreFlight Flat UI
+            <span className="text-slate-400 hidden sm:inline">
+              Next.js 16.3.5 App Router • React 19 • DevPreFlight Flat UI Kit
             </span>
           </div>
-          <div className="flex items-center gap-4 text-slate-300">
-            <Link
-              href="https://github.com/DevPreFlight/nextlaunch-free"
-              target="_blank"
-              className="hover:text-white transition-colors flex items-center gap-1"
-            >
-              <span>GitHub (MIT)</span>
-              <ExternalLink className="w-3 h-3" />
-            </Link>
-            <span className="text-slate-700">|</span>
-            <Link href="/admin" className="text-blue-400 hover:text-blue-300 transition-colors font-mono">
-              Admin Portal →
+
+          <div className="flex items-center gap-3 text-xs font-mono text-slate-300">
+            <Link href="/admin" className="text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+              <span>Super Admin</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Header / Navbar */}
+      {/* Main App Navigation Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
@@ -262,201 +236,257 @@ export default function HomePage() {
                 NL
               </div>
               <div className="flex flex-col">
-                <span className="text-base font-bold text-slate-900 leading-tight">NextLaunch</span>
+                <span className="text-base font-bold text-slate-900 leading-tight">NextLaunch App Workspace</span>
                 <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
-                  DevPreFlight Engine
+                  Developer Control Center
                 </span>
               </div>
             </Link>
 
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-              <a href="#features" className="hover:text-blue-600 transition-colors">
-                Modules
+              <a href="#quickstart" className="hover:text-blue-600 transition-colors">
+                Setup Checklist
+              </a>
+              <a href="#subsystems" className="hover:text-blue-600 transition-colors">
+                Subsystems ({subsystems.length})
               </a>
               <a href="#sandbox" className="hover:text-blue-600 transition-colors">
-                Interactive Sandbox
+                API Sandbox
               </a>
-              <a href="#tiers" className="hover:text-blue-600 transition-colors">
-                Editions & Pricing
+              <a href="#routes" className="hover:text-blue-600 transition-colors">
+                Local Endpoints
               </a>
-              <a href="#quickstart" className="hover:text-blue-600 transition-colors">
-                CLI Quickstart
-              </a>
-              <a href="#faq" className="hover:text-blue-600 transition-colors">
-                FAQ
+              <a href="#docs" className="hover:text-blue-600 transition-colors">
+                Architecture Tour
               </a>
             </nav>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Link
               href="/admin"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors hidden sm:inline-flex items-center gap-1.5"
-            >
-              <Server className="w-3.5 h-3.5 text-slate-500" />
-              <span>Live Admin Demo</span>
-            </Link>
-            <a
-              href="#tiers"
               className="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition-all shadow-sm flex items-center gap-1.5"
             >
-              <span>Get NextLaunch</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+              <Server className="w-4 h-4" />
+              <span>Open Super Admin Portal</span>
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-24 overflow-hidden border-b border-slate-200 bg-white">
+      {/* Hero: Welcome & Developer Overview */}
+      <section className="pt-10 pb-12 sm:pt-14 sm:pb-16 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            {/* Top Eyebrow */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-200 mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-200 mb-5">
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>Crafted for Next.js 16 App Router & React 19</span>
+              <span>NextLaunch SaaS Engine Successfully Initialized</span>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.1]">
-              The Production-Grade Full-Stack SaaS Engine.
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Your Full-Stack SaaS Boilerplate is Live.
             </h1>
 
-            {/* Subheading */}
-            <p className="mt-6 text-base sm:text-lg text-slate-600 leading-relaxed">
-              Ship with enterprise confidence. NextLaunch delivers verified dual Stripe & Polar multi-billing, Standard Webhooks signing, cryptographic SHA-256 API keys, 2FA TOTP security, and DevPreFlight Flat UI components—with zero fluff.
+            <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
+              All core backend infrastructure—Dual Stripe & Polar billing, Standard Webhooks signing, cryptographic API keys, 2FA TOTP authentication, and DevPreFlight Flat UI primitives—is configured and ready for your custom business logic.
             </p>
 
-            {/* Interactive CLI Scaffolder Snippet */}
-            <div className="mt-8 p-3 sm:p-4 rounded-xl bg-slate-900 text-slate-100 border border-slate-800 shadow-sm max-w-xl">
-              <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-800">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => setActiveCliTab('npx')}
-                    className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                      activeCliTab === 'npx' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    npx
-                  </button>
-                  <button
-                    onClick={() => setActiveCliTab('pnpm')}
-                    className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                      activeCliTab === 'pnpm' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    pnpm
-                  </button>
-                  <button
-                    onClick={() => setActiveCliTab('bun')}
-                    className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                      activeCliTab === 'bun' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    bun
-                  </button>
-                </div>
-                <span className="text-[11px] font-mono text-slate-400">Scaffold in 5 seconds</span>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 font-mono text-xs sm:text-sm py-1 px-1">
-                <div className="flex items-center gap-2 overflow-x-auto text-slate-200">
-                  <span className="text-blue-400 select-none">❯</span>
-                  <span>{cliCommands[activeCliTab]}</span>
-                </div>
-                <button
-                  onClick={() => copyToClipboard(cliCommands[activeCliTab], 'hero-cli')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono transition-colors shrink-0"
-                  aria-label="Copy CLI command"
-                >
-                  {copiedCmd === 'hero-cli' ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400 font-sans font-medium">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span className="font-sans font-medium">Copy</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* CTA Button Group */}
-            <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-              <a
-                href="#sandbox"
-                className="px-5 py-3 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 active:scale-[0.99] transition-all shadow-sm flex items-center gap-2"
-              >
-                <span>Test Live Interactive Sandbox</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
+            {/* Quick Action Cockpit Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
               <Link
                 href="/admin"
-                className="px-5 py-3 rounded-lg text-sm font-semibold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300 active:scale-[0.99] transition-all flex items-center gap-2"
+                className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 hover:bg-white hover:shadow-sm transition-all group"
               >
-                <Server className="w-4 h-4 text-slate-600" />
-                <span>Open Admin Portal</span>
+                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <Server className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center justify-between">
+                  <span>Super Admin</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Inspect workspace metrics, users, and trigger user impersonation.
+                </p>
               </Link>
-            </div>
 
-            {/* Proof Badges */}
-            <div className="mt-10 pt-6 border-t border-slate-200 flex flex-wrap items-center gap-6 text-xs text-slate-600 font-medium">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>49 Unit Tests Passing</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>RFC 6238 TOTP Standard</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Standard Webhooks v1</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Stripe + Polar MoR</span>
-              </div>
+              <a
+                href="#sandbox"
+                className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 hover:bg-white hover:shadow-sm transition-all group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold mb-3 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                  <Terminal className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center justify-between">
+                  <span>API Sandbox</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Test HMAC signatures, 2FA tokens, and audit event dispatching.
+                </p>
+              </a>
+
+              <a
+                href="#quickstart"
+                className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 hover:bg-white hover:shadow-sm transition-all group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold mb-3 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                  <Code2 className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center justify-between">
+                  <span>Setup Checklist</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-purple-600 transition-colors" />
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  4 next steps to connect your database and launch your app.
+                </p>
+              </a>
+
+              <a
+                href="#routes"
+                className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 hover:bg-white hover:shadow-sm transition-all group"
+              >
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold mb-3 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center justify-between">
+                  <span>API Endpoints</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600 transition-colors" />
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Explore 8 pre-wired REST route handlers and Server Actions.
+                </p>
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Interactive Live Sandbox Section */}
-      <section id="sandbox" className="py-16 sm:py-24 border-b border-slate-200 bg-slate-50">
+      {/* Section 1: Developer Quickstart & Setup Checklist */}
+      <section id="quickstart" className="py-12 sm:py-16 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/80 text-slate-800 text-xs font-semibold mb-3">
-              <Terminal className="w-3.5 h-3.5 text-blue-600" />
-              <span>Real Architecture Playground</span>
+          <div className="max-w-3xl mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/80 text-slate-800 text-xs font-semibold mb-2">
+              <Play className="w-3.5 h-3.5 text-blue-600" />
+              <span>Getting Started Guide</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Test Core Backend Modules in Real-Time
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              4 Steps to Configure & Customize Your Project
             </h2>
-            <p className="mt-3 text-slate-600 text-base">
-              Interact with live simulated states for billing reconciliation, webhook HMAC signatures, audit trails, and TOTP authentication.
+            <p className="mt-2 text-slate-600 text-sm sm:text-base">
+              Follow this quick sequence to connect your local PostgreSQL database and start building features.
             </p>
           </div>
 
-          {/* Sandbox Component Box */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            {/* Tab Navigation */}
-            <div className="flex flex-wrap border-b border-slate-200 bg-slate-100/70 p-2 gap-1.5">
-              <button
-                onClick={() => setActiveSandboxTab('billing')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
-                  activeSandboxTab === 'billing'
-                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-                }`}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {quickSteps.map((step) => (
+              <div
+                key={step.step}
+                className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between"
               >
-                <CreditCard className="w-4 h-4" />
-                <span>1. Dual Billing (Stripe vs Polar)</span>
-              </button>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="w-8 h-8 rounded-lg bg-blue-600 text-white font-mono font-bold text-xs flex items-center justify-center">
+                      {step.step}
+                    </span>
+                    <span className="text-xs font-mono text-slate-400 font-semibold">Ready in Terminal</span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">{step.title}</h3>
+                  <p className="mt-2 text-xs text-slate-600 leading-relaxed">{step.desc}</p>
+                </div>
 
+                <div className="mt-5 p-3 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 overflow-x-auto text-blue-300">
+                    <span className="text-slate-500 select-none">❯</span>
+                    <span>{step.code}</span>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(step.code, `step-${step.step}`)}
+                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors shrink-0"
+                    title="Copy command"
+                    aria-label="Copy terminal command"
+                  >
+                    {copiedSnippet === `step-${step.step}` ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2: Subsystems Overview */}
+      <section id="subsystems" className="py-12 sm:py-16 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-2">
+              <Layers className="w-3.5 h-3.5 text-blue-600" />
+              <span>Core Architecture</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              8 Pre-Integrated Backend Subsystems
+            </h2>
+            <p className="mt-2 text-slate-600 text-sm sm:text-base">
+              Every subsystem is modular, strictly typed, and covered by automated unit tests in <code className="text-blue-600 font-mono text-xs">tests/unit/</code>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {subsystems.map((sub) => {
+              const Icon = sub.icon;
+              return (
+                <div
+                  key={sub.title}
+                  className="p-5 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        {sub.status} ✓
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900">{sub.title}</h3>
+                    <span className="text-[11px] font-semibold text-blue-600 block mt-0.5">{sub.subtitle}</span>
+                    <p className="mt-2 text-xs text-slate-600 leading-relaxed">{sub.desc}</p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-200/80">
+                    <code className="text-[10px] font-mono text-slate-500 block truncate" title={sub.path}>
+                      {sub.path}
+                    </code>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 3: Interactive Local API Sandbox */}
+      <section id="sandbox" className="py-12 sm:py-16 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/80 text-slate-800 text-xs font-semibold mb-2">
+              <Terminal className="w-3.5 h-3.5 text-blue-600" />
+              <span>Interactive Local Sandbox</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Test Core Backend Flows Locally
+            </h2>
+            <p className="mt-2 text-slate-600 text-sm sm:text-base">
+              Interact with simulated backend payloads, HMAC signature generators, 2FA tokens, and audit event logs.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Sandbox Tabs */}
+            <div className="flex flex-wrap border-b border-slate-200 bg-slate-100/70 p-2 gap-1.5">
               <button
                 onClick={() => setActiveSandboxTab('webhooks')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
@@ -466,7 +496,19 @@ export default function HomePage() {
                 }`}
               >
                 <Webhook className="w-4 h-4" />
-                <span>2. Outgoing Webhooks & HMAC</span>
+                <span>1. Standard Webhooks HMAC Signer</span>
+              </button>
+
+              <button
+                onClick={() => setActiveSandboxTab('auth')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
+                  activeSandboxTab === 'auth'
+                    ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                }`}
+              >
+                <Lock className="w-4 h-4" />
+                <span>2. RFC 6238 TOTP Authenticator</span>
               </button>
 
               <button
@@ -478,526 +520,316 @@ export default function HomePage() {
                 }`}
               >
                 <FileSpreadsheet className="w-4 h-4" />
-                <span>3. Audit Logs & Diff Trail</span>
+                <span>3. Compliance Audit Stream</span>
               </button>
 
               <button
-                onClick={() => setActiveSandboxTab('totp')}
+                onClick={() => setActiveSandboxTab('billing')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
-                  activeSandboxTab === 'totp'
+                  activeSandboxTab === 'billing'
                     ? 'bg-white text-blue-700 shadow-sm border border-slate-200'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                 }`}
               >
-                <Lock className="w-4 h-4" />
-                <span>4. 2FA TOTP & Recovery</span>
+                <CreditCard className="w-4 h-4" />
+                <span>4. Multi-Billing Adapter</span>
               </button>
             </div>
 
-            {/* Tab 1 Content: Dual Billing */}
-            {activeSandboxTab === 'billing' && (
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">Unified Billing Provider Adapter</h3>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                      Toggle between Stripe for direct payment processing or Polar.sh as a Merchant of Record (handling global tax).
-                    </p>
-                  </div>
-                  <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
-                    <button
-                      onClick={() => setBillingProvider('stripe')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors ${
-                        billingProvider === 'stripe' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Stripe Subscriptions
-                    </button>
-                    <button
-                      onClick={() => setBillingProvider('polar')}
-                      className={`px-3 py-1.5 rounded-md text-xs font-bold transition-colors ${
-                        billingProvider === 'polar' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                    >
-                      Polar.sh MoR
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                  <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-xs font-mono font-semibold text-blue-700 uppercase tracking-wider">
-                      Active Adapter Configuration
-                    </span>
-                    <div className="mt-4 space-y-3 font-mono text-xs">
-                      <div className="flex justify-between py-1.5 border-b border-slate-200">
-                        <span className="text-slate-500">Provider:</span>
-                        <span className="font-bold text-slate-800 uppercase">{billingProvider}</span>
-                      </div>
-                      <div className="flex justify-between py-1.5 border-b border-slate-200">
-                        <span className="text-slate-500">Tax Mode:</span>
-                        <span className="font-semibold text-slate-800">
-                          {billingProvider === 'polar' ? 'Automated MoR (Global VAT/Sales Tax)' : 'Stripe Tax / Direct'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between py-1.5 border-b border-slate-200">
-                        <span className="text-slate-500">Webhook Handler:</span>
-                        <code className="text-blue-600">/api/webhooks/{billingProvider}</code>
-                      </div>
-                      <div className="flex justify-between py-1.5">
-                        <span className="text-slate-500">Sync Strategy:</span>
-                        <span className="text-emerald-700 font-semibold">Idempotent DB Upsert</span>
-                      </div>
+            {/* Sandbox Content */}
+            <div className="p-6 sm:p-8">
+              {activeSandboxTab === 'webhooks' && (
+                <div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Standard Webhooks v1 Dispatcher</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Generates cryptographic SHA-256 signatures matching the Standard Webhooks specification.
+                      </p>
                     </div>
-                  </div>
-
-                  <div className="p-5 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs overflow-x-auto">
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
-                      <span>Mock Customer Portal Response</span>
-                      <span className="text-emerald-400">200 OK</span>
-                    </div>
-                    <pre className="text-slate-300 leading-relaxed">
-{JSON.stringify(
-  {
-    provider: billingProvider,
-    customerId: `${billingProvider === 'stripe' ? 'cus_test_92k1' : 'usr_pol_88aa'}`,
-    status: 'active',
-    plan: 'Pro Tier ($29/mo)',
-    currentPeriodEnd: '2026-10-21T00:00:00.000Z',
-    cancelAtPeriodEnd: false,
-  },
-  null,
-  2
-)}
-                    </pre>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab 2 Content: Webhooks & HMAC */}
-            {activeSandboxTab === 'webhooks' && (
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">Standard Webhooks Signing Simulator</h3>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                      Generates standard HMAC-SHA256 headers (<code className="text-blue-600 font-mono">webhook-signature: v1,t=...</code>) compliant with Standard Webhooks specification.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
                     <select
-                      value={webhookPayloadEvent}
-                      onChange={(e) => setWebhookPayloadEvent(e.target.value)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      value={webhookEvent}
+                      onChange={(e) => setWebhookEvent(e.target.value)}
+                      className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-mono text-slate-800"
                     >
                       <option value="subscription.created">Event: subscription.created</option>
-                      <option value="subscription.updated">Event: subscription.updated</option>
-                      <option value="invoice.payment_succeeded">Event: invoice.payment_succeeded</option>
+                      <option value="subscription.canceled">Event: subscription.canceled</option>
                       <option value="user.2fa_enabled">Event: user.2fa_enabled</option>
                     </select>
                   </div>
-                </div>
 
-                <div className="mt-6 space-y-4">
-                  <div className="p-4 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs">
-                    <span className="text-slate-400 block mb-1">Standard Webhooks Outgoing Headers:</span>
-                    <div className="text-blue-300 space-y-1">
-                      <div>webhook-id: <span className="text-emerald-400">msg_2tK9X8m10pQ</span></div>
-                      <div>webhook-timestamp: <span className="text-emerald-400">1789926000</span></div>
-                      <div className="break-all">webhook-signature: <span className="text-emerald-400">v1,g0hM2k9X7+v8aLk1pQmNoP...=</span></div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
-                        200
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div className="p-4 rounded-xl bg-slate-900 text-slate-100 font-mono text-xs">
+                      <span className="text-slate-400 block mb-2 font-bold">Standard Signed Headers:</span>
+                      <div className="space-y-1.5 text-blue-300">
+                        <div>webhook-id: <span className="text-emerald-400">msg_9k2mP1a8Lq</span></div>
+                        <div>webhook-timestamp: <span className="text-emerald-400">{Math.floor(Date.now() / 1000)}</span></div>
+                        <div className="break-all">webhook-signature: <span className="text-emerald-400">v1,v0a8h9mK2lPq7...=</span></div>
                       </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
                       <div>
-                        <div className="text-xs font-bold text-slate-900">Destination Endpoint: https://api.customer.io/webhooks</div>
-                        <div className="text-[11px] text-slate-500 font-mono">Latency: 42ms • Signature Verified ✓</div>
+                        <span className="text-xs font-bold text-slate-800 block mb-1">Testing Endpoint Locally:</span>
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                          You can test dispatching an outgoing webhook by sending a POST request to <code className="text-blue-600 font-mono">/api/webhooks/outgoing</code>.
+                        </p>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                        <span className="font-mono text-slate-500">Auto-retry: 5 backoffs</span>
+                        <span className="text-emerald-600 font-bold">Signature Verified ✓</span>
                       </div>
                     </div>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      Delivered (Attempt 1)
-                    </span>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Tab 3 Content: Audit Logs */}
-            {activeSandboxTab === 'audit' && (
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">Enterprise Audit Log Stream</h3>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                      Every sensitive action is cryptographically recorded with actor attribution and metadata snapshot.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => alert('Simulated CSV export download triggered for compliance audit.')}
-                    className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-300 transition-colors flex items-center gap-1.5"
-                  >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Export CSV Sample</span>
-                  </button>
-                </div>
-
-                <div className="mt-6 overflow-x-auto">
-                  <table className="w-full text-left text-xs font-mono">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-slate-500">
-                        <th className="pb-2 font-semibold">Timestamp</th>
-                        <th className="pb-2 font-semibold">Action</th>
-                        <th className="pb-2 font-semibold">Actor</th>
-                        <th className="pb-2 font-semibold">IP Address</th>
-                        <th className="pb-2 font-semibold">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      <tr>
-                        <td className="py-2.5 text-slate-500">Just now</td>
-                        <td className="py-2.5 font-bold text-slate-800">auth.2fa.enable</td>
-                        <td className="py-2.5 text-blue-600">user_rhaka_adm</td>
-                        <td className="py-2.5 text-slate-600">103.144.17.20</td>
-                        <td className="py-2.5 text-emerald-600 font-semibold">SUCCESS</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2.5 text-slate-500">2 mins ago</td>
-                        <td className="py-2.5 font-bold text-slate-800">api_key.create</td>
-                        <td className="py-2.5 text-blue-600">user_rhaka_adm</td>
-                        <td className="py-2.5 text-slate-600">103.144.17.20</td>
-                        <td className="py-2.5 text-emerald-600 font-semibold">SUCCESS</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2.5 text-slate-500">15 mins ago</td>
-                        <td className="py-2.5 font-bold text-slate-800">billing.subscription.create</td>
-                        <td className="py-2.5 text-blue-600">system_webhook</td>
-                        <td className="py-2.5 text-slate-600">35.184.22.10</td>
-                        <td className="py-2.5 text-emerald-600 font-semibold">SUCCESS</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* Tab 4 Content: 2FA TOTP */}
-            {activeSandboxTab === 'totp' && (
-              <div className="p-6 sm:p-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">RFC 6238 TOTP Engine & Backup Codes</h3>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                      Industry standard HMAC-based one-time password authenticator integration with backup recovery array.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setTotpCode(Math.floor(100000 + Math.random() * 900000).toString())}
-                    className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold border border-blue-200 transition-colors flex items-center gap-1.5"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Generate New OTP Token</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                  <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center text-center">
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider font-mono">
-                      Current Authenticator Code
-                    </span>
-                    <div className="text-4xl font-extrabold font-mono text-blue-600 tracking-widest my-3">
-                      {totpCode}
-                    </div>
-                    <span className="text-[11px] text-slate-500 font-mono">
-                      Window interval: 30s • Valid ±1 step
-                    </span>
-                  </div>
-
-                  <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-                    <span className="text-xs font-semibold text-slate-700 font-mono block mb-2">
-                      8-Digit Hashed Backup Recovery Codes
-                    </span>
-                    <div className="grid grid-cols-2 gap-2 font-mono text-xs text-slate-600">
-                      <div className="p-2 rounded bg-white border border-slate-200 text-center">8472-9104</div>
-                      <div className="p-2 rounded bg-white border border-slate-200 text-center">1938-4420</div>
-                      <div className="p-2 rounded bg-white border border-slate-200 text-center">5092-1183</div>
-                      <div className="p-2 rounded bg-white border border-slate-200 text-center">7264-9912</div>
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-2">
-                      Hashed with SHA-256 before persistence in database. Single-use only.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Core Architectural Modules Section */}
-      <section id="features" className="py-16 sm:py-24 border-b border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-3">
-              <Layers className="w-3.5 h-3.5 text-blue-600" />
-              <span>Modular SaaS Foundation</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              8 Enterprise-Grade Subsystems
-            </h2>
-            <p className="mt-3 text-slate-600 text-base">
-              Each module is isolated, strictly typed, and covered by automated unit tests. Use only what you need.
-            </p>
-          </div>
-
-          {/* Feature Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {coreModules.map((mod) => {
-              const Icon = mod.icon;
-              return (
-                <div
-                  key={mod.id}
-                  className="p-6 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                        {mod.badge}
-                      </span>
-                    </div>
-                    <div className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider mb-1">
-                      {mod.tag}
-                    </div>
-                    <h3 className="text-base font-bold text-slate-900">{mod.title}</h3>
-                    <p className="mt-2 text-xs text-slate-600 leading-relaxed">{mod.description}</p>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-mono">
-                    <span>{mod.metrics}</span>
-                    <span className="text-emerald-600 font-semibold">Active ✓</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* 3-Tier Editions & Pricing Section */}
-      <section id="tiers" className="py-16 sm:py-24 border-b border-slate-200 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-200/80 text-slate-800 text-xs font-semibold mb-3">
-              <span>Fair & Transparent Licensing</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Choose the Edition That Fits Your Workflow
-            </h2>
-            <p className="mt-3 text-slate-600 text-base">
-              From open-source community exploration to multi-client commercial SaaS production.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-            {tiers.map((tier) => (
-              <div
-                key={tier.name}
-                className={`rounded-2xl p-8 flex flex-col justify-between transition-all ${
-                  tier.isPopular
-                    ? 'bg-white border-2 border-blue-600 shadow-lg relative'
-                    : 'bg-white border border-slate-200 shadow-sm'
-                }`}
-              >
-                {tier.isPopular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-blue-600 text-white font-semibold text-xs shadow-sm">
-                    {tier.badge}
-                  </div>
-                )}
-
+              {activeSandboxTab === 'auth' && (
                 <div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
                     <div>
-                      <h3 className="text-xl font-bold text-slate-900">{tier.name}</h3>
-                      <p className="text-xs text-slate-500 mt-0.5">{tier.subtitle}</p>
+                      <h3 className="text-base font-bold text-slate-900">RFC 6238 TOTP Engine</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        HMAC-based one-time password authenticator integration with backup recovery array.
+                      </p>
                     </div>
-                    {!tier.isPopular && (
-                      <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
-                        {tier.badge}
-                      </span>
-                    )}
+                    <button
+                      onClick={() => setTotpCode(Math.floor(100000 + Math.random() * 900000).toString())}
+                      className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold border border-blue-200 transition-colors flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Generate New OTP Token</span>
+                    </button>
                   </div>
 
-                  <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{tier.price}</span>
-                    <span className="text-xs text-slate-500 font-medium">/ {tier.period}</span>
-                  </div>
-
-                  <p className="mt-3 text-xs text-slate-600 leading-relaxed">{tier.description}</p>
-
-                  <div className="mt-6 pt-6 border-t border-slate-100 space-y-3">
-                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wider font-mono block">
-                      What is included:
-                    </span>
-                    {tier.features.map((feat) => (
-                      <div key={feat} className="flex items-start gap-2.5 text-xs text-slate-600">
-                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                        <span>{feat}</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 text-center flex flex-col items-center justify-center">
+                      <span className="text-xs font-semibold text-slate-500 font-mono uppercase">Current TOTP Token</span>
+                      <div className="text-4xl font-extrabold font-mono text-blue-600 tracking-widest my-2">
+                        {totpCode}
                       </div>
-                    ))}
+                      <span className="text-[11px] text-slate-500 font-mono">30s interval • Valid ±1 time step</span>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
+                      <span className="text-xs font-bold text-slate-800 font-mono block mb-2">
+                        Hashed Backup Recovery Codes
+                      </span>
+                      <div className="grid grid-cols-2 gap-2 font-mono text-xs text-slate-600">
+                        <div className="p-2 rounded bg-white border border-slate-200 text-center">8472-9104</div>
+                        <div className="p-2 rounded bg-white border border-slate-200 text-center">1938-4420</div>
+                        <div className="p-2 rounded bg-white border border-slate-200 text-center">5092-1183</div>
+                        <div className="p-2 rounded bg-white border border-slate-200 text-center">7264-9912</div>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-2">
+                        SHA-256 hashed in database for single-use emergency recovery.
+                      </p>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="mt-8 pt-6 border-t border-slate-100">
-                  <a
-                    href={tier.ctaHref}
-                    target={tier.ctaHref.startsWith('http') ? '_blank' : undefined}
-                    className={`w-full py-3 rounded-xl font-bold text-xs sm:text-sm text-center flex items-center justify-center gap-2 transition-all ${
-                      tier.isPopular
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm active:scale-[0.99]'
-                        : 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-200'
-                    }`}
-                  >
-                    <span>{tier.ctaText}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
+              {activeSandboxTab === 'audit' && (
+                <div>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Compliance Audit Event Trail</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Recorded events include actor ID, IP origin, action type, and diff snapshots.
+                      </p>
+                    </div>
+                    <Link
+                      href="/api/audit-logs"
+                      className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-300 transition-colors"
+                    >
+                      View /api/audit-logs →
+                    </Link>
+                  </div>
+
+                  <div className="mt-4 overflow-x-auto">
+                    <table className="w-full text-left text-xs font-mono">
+                      <thead>
+                        <tr className="border-b border-slate-200 text-slate-500">
+                          <th className="pb-2">Action</th>
+                          <th className="pb-2">Actor</th>
+                          <th className="pb-2">IP Origin</th>
+                          <th className="pb-2">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        <tr>
+                          <td className="py-2.5 font-bold text-slate-800">auth.session.create</td>
+                          <td className="py-2.5 text-blue-600">user_demo_lead</td>
+                          <td className="py-2.5 text-slate-600">127.0.0.1</td>
+                          <td className="py-2.5 text-emerald-600 font-bold">SUCCESS</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2.5 font-bold text-slate-800">api_key.verify</td>
+                          <td className="py-2.5 text-blue-600">system_worker</td>
+                          <td className="py-2.5 text-slate-600">127.0.0.1</td>
+                          <td className="py-2.5 text-emerald-600 font-bold">SUCCESS</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )}
+
+              {activeSandboxTab === 'billing' && (
+                <div>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Stripe & Polar.sh Dual Billing</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Zero vendor lock-in. Switch or combine Stripe subscriptions and Polar Merchant of Record.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 font-mono text-xs">
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="font-bold text-blue-700 mb-2">Stripe Checkout Adapter</div>
+                      <div className="text-slate-600 space-y-1">
+                        <div>Handler: <code>/api/webhooks/stripe</code></div>
+                        <div>Mode: Direct Merchant Checkout</div>
+                        <div>Features: Subscriptions, Invoicing</div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="font-bold text-blue-700 mb-2">Polar.sh MoR Adapter</div>
+                      <div className="text-slate-600 space-y-1">
+                        <div>Handler: <code>/api/webhooks/polar</code></div>
+                        <div>Mode: Merchant of Record (Global Tax)</div>
+                        <div>Features: Automated VAT/Sales Tax</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CLI Quickstart Section */}
-      <section id="quickstart" className="py-16 sm:py-24 border-b border-slate-200 bg-white">
+      {/* Section 4: Local Endpoints Directory */}
+      <section id="routes" className="py-12 sm:py-16 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-3">
+          <div className="max-w-3xl mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-2">
               <Code2 className="w-3.5 h-3.5 text-blue-600" />
-              <span>Developer Workflow</span>
+              <span>Route Handlers</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Get Up and Running in 3 Steps
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Pre-Wired Local Endpoints & Routes
             </h2>
-            <p className="mt-3 text-slate-600 text-base">
-              No complicated configuration steps. Run the scaffolder, set your environment keys, and start developing.
+            <p className="mt-2 text-slate-600 text-sm sm:text-base">
+              These route handlers are live in your workspace and ready for requests.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm mb-4">
-                1
-              </div>
-              <h3 className="text-sm font-bold text-slate-900">Run the Scaffolder</h3>
-              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Initialize with your preferred package manager and select your tier.
-              </p>
-              <div className="mt-4 p-3 rounded-lg bg-slate-900 text-blue-300 font-mono text-xs">
-                npx @devpreflight/nextlaunch init my-app
-              </div>
-            </div>
-
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm mb-4">
-                2
-              </div>
-              <h3 className="text-sm font-bold text-slate-900">Configure Database & Keys</h3>
-              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Copy the clean environment template and add your credentials.
-              </p>
-              <div className="mt-4 p-3 rounded-lg bg-slate-900 text-blue-300 font-mono text-xs">
-                cp .env.example .env.local
-              </div>
-            </div>
-
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm mb-4">
-                3
-              </div>
-              <h3 className="text-sm font-bold text-slate-900">Launch & Verify</h3>
-              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Run the test suite and launch the local Turbopack development server.
-              </p>
-              <div className="mt-4 p-3 rounded-lg bg-slate-900 text-blue-300 font-mono text-xs">
-                npm test && npm run dev
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Technical FAQ Section */}
-      <section id="faq" className="py-16 sm:py-24 border-b border-slate-200 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              Frequently Asked Technical Questions
-            </h2>
-            <p className="mt-3 text-slate-600 text-sm sm:text-base">
-              Everything you need to know about architecture, dependencies, and licensing.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {faqItems.map((item, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {localEndpoints.map((ep) => (
               <div
-                key={item.question}
-                className="rounded-xl border border-slate-200 bg-white overflow-hidden transition-colors"
+                key={ep.path}
+                className="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 transition-all"
               >
-                <button
-                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-900 text-sm hover:text-blue-600 transition-colors"
-                >
-                  <span>{item.question}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-slate-500 transition-transform ${
-                      openFaqIndex === index ? 'rotate-180 text-blue-600' : ''
-                    }`}
-                  />
-                </button>
-                {openFaqIndex === index && (
-                  <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
-                    {item.answer}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-mono font-extrabold px-2 py-0.5 rounded ${
+                      ep.method === 'POST' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                    }`}>
+                      {ep.method}
+                    </span>
+                    <code className="text-xs font-mono font-bold text-slate-900">{ep.path}</code>
                   </div>
-                )}
+                  <span className="text-[10px] font-mono text-slate-500">{ep.category}</span>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">{ep.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Modern High-Craft Footer */}
-      <footer className="bg-white py-12 text-slate-600 text-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      {/* Section 5: Architecture Tour & Directory Layout */}
+      <section id="docs" className="py-12 sm:py-16 bg-slate-50 border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/80 text-slate-800 text-xs font-semibold mb-2">
+              <FolderTree className="w-3.5 h-3.5 text-blue-600" />
+              <span>Codebase Structure</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Where Everything Lives in NextLaunch
+            </h2>
+            <p className="mt-2 text-slate-600 text-sm sm:text-base">
+              Organized with clean domain boundaries and zero circular dependencies.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-mono text-xs">
+            <div className="p-5 rounded-xl bg-white border border-slate-200">
+              <div className="font-bold text-slate-900 text-sm font-sans mb-3 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-blue-600" />
+                <span>src/app/ (App Router)</span>
+              </div>
+              <ul className="space-y-2 text-slate-600">
+                <li><code className="text-blue-600 font-bold">admin/</code>: Super Admin Control Center</li>
+                <li><code className="text-blue-600 font-bold">api/</code>: REST Route Handlers</li>
+                <li><code className="text-blue-600 font-bold">actions/</code>: React Server Actions</li>
+                <li><code className="text-blue-600 font-bold">globals.css</code>: Tailwind & Theme tokens</li>
+              </ul>
+            </div>
+
+            <div className="p-5 rounded-xl bg-white border border-slate-200">
+              <div className="font-bold text-slate-900 text-sm font-sans mb-3 flex items-center gap-2">
+                <Server className="w-4 h-4 text-blue-600" />
+                <span>src/services/ (Backend Logic)</span>
+              </div>
+              <ul className="space-y-2 text-slate-600">
+                <li><code className="text-blue-600 font-bold">auth.service.ts</code>: RBAC & Sessions</li>
+                <li><code className="text-blue-600 font-bold">billing.service.ts</code>: Stripe & Polar</li>
+                <li><code className="text-blue-600 font-bold">outgoing-webhook.service.ts</code></li>
+                <li><code className="text-blue-600 font-bold">two-factor.service.ts</code>: TOTP 2FA</li>
+              </ul>
+            </div>
+
+            <div className="p-5 rounded-xl bg-white border border-slate-200">
+              <div className="font-bold text-slate-900 text-sm font-sans mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-600" />
+                <span>src/components/preflight-ui/</span>
+              </div>
+              <ul className="space-y-2 text-slate-600">
+                <li><code className="text-blue-600 font-bold">primitives/</code>: Buttons, Inputs, Switches</li>
+                <li><code className="text-blue-600 font-bold">feedback/</code>: Modals, Drawers, Toast, Cookies</li>
+                <li><code className="text-blue-600 font-bold">marketing/</code>: Feature grids, FAQ</li>
+                <li><code className="text-blue-600 font-bold">commerce/</code>: Pricing, Checkout cards</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white py-10 text-slate-600 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
               NL
             </div>
             <div>
-              <p className="font-bold text-slate-900">NextLaunch Pro SaaS Engine</p>
-              <p className="text-slate-500">© 2026 DevPreFlight Team. All rights reserved.</p>
+              <p className="font-bold text-slate-900">NextLaunch Developer Workspace</p>
+              <p className="text-slate-500">Built with DevPreFlight Flat UI & Next.js 16 App Router.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-6 font-medium">
+            <Link href="/admin" className="text-blue-600 font-bold hover:underline">
+              Super Admin Portal →
+            </Link>
             <Link href="https://devpreflight.com" target="_blank" className="hover:text-blue-600 transition-colors">
-              DevPreFlight
-            </Link>
-            <Link href="https://github.com/DevPreFlight/nextlaunch-free" target="_blank" className="hover:text-blue-600 transition-colors">
-              GitHub (MIT)
-            </Link>
-            <Link href="/admin" className="hover:text-blue-600 transition-colors">
-              Admin Sandbox
-            </Link>
-            <Link href="#tiers" className="text-blue-600 font-bold hover:underline">
-              Get Commercial
+              DevPreFlight Hub
             </Link>
           </div>
         </div>
