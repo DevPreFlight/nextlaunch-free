@@ -52,7 +52,7 @@ Upgrade to **NextLaunch Pro (Commercial Edition)** for:
 - 📋 **Compliance Audit Event Logging & Streaming CSV/JSON Exports**
 - 🏢 **Multi-Tenant Team Workspaces & Permissions**
 
-👉 **Explore NextLaunch Pro**: [https://devpreflight.com/nextlaunch](https://devpreflight.com/nextlaunch)
+👉 **Explore NextLaunch Pro**: [https://devpreflight.com/products/nextlaunch-pro](https://devpreflight.com/products/nextlaunch-pro)
 
 ---
 

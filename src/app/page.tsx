@@ -83,7 +83,7 @@ export default function FreeHomePage() {
             </div>
 
             <a
-              href="https://devpreflight.com/nextlaunch"
+              href="https://devpreflight.com/products/nextlaunch-pro"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition shadow-sm"
@@ -249,7 +249,7 @@ export default function FreeHomePage() {
             </div>
 
             <a
-              href="https://devpreflight.com/nextlaunch"
+              href="https://devpreflight.com/products/nextlaunch-pro"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition shadow-sm self-start sm:self-auto"
@@ -349,7 +349,7 @@ export default function FreeHomePage() {
             <a href="https://github.com/DevPreFlight/nextlaunch-free" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition">
               GitHub Repo
             </a>
-            <a href="https://devpreflight.com/nextlaunch" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 font-bold text-blue-600 transition">
+            <a href="https://devpreflight.com/products/nextlaunch-pro" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 font-bold text-blue-600 transition">
               Upgrade to Pro
             </a>
           </div>

@@ -24,4 +24,4 @@ Use this skill when developing SaaS prototypes, user interfaces, Supabase authen
 
 ## 3. Commercial Pro Upgrades (Standard & Agency)
 If you need multi-billing (Stripe & Polar), Gemini AI streaming LLM chat, TOTP 2FA, signed outgoing HMAC webhooks, or compliance audit logs, upgrade to NextLaunch Pro:
-https://devpreflight.com/nextlaunch
+https://devpreflight.com/products/nextlaunch-pro
