@@ -14,32 +14,18 @@ enum Role {
   VIEWER
 }
 
-enum SubscriptionStatus {
-  INCOMPLETE
-  INCOMPLETE_EXPIRED
-  TRIALING
-  ACTIVE
-  PAST_DUE
-  CANCELED
-  UNPAID
-}
-
 model User {
-  id                  String            @id @default(cuid())
-  name                String?
-  email               String            @unique
-  emailVerified       DateTime?
-  image               String?
-  twoFactorEnabled    Boolean           @default(false)
-  twoFactorSecret     String?
-  twoFactorBackupCodes String[]         @default([])
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  id            String            @id @default(cuid())
+  name          String?
+  email         String            @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
-  memberships         WorkspaceMember[]
-  accounts            Account[]
-  sessions            Session[]
-  auditLogs           AuditLog[]
+  memberships   WorkspaceMember[]
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
@@ -73,122 +59,27 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
 model Workspace {
-  id                  String             @id @default(cuid())
-  name                String
-  slug                String             @unique
-  logo                String?
-  plan                String             @default("free") // "free", "starter", "pro", "enterprise"
-  polarCustomerId     String?            @unique
-  polarSubscriptionId String?            @unique
-  stripeCustomerId    String?            @unique
-  stripeSubscriptionId String?           @unique
-  subscriptionStatus  SubscriptionStatus @default(ACTIVE)
-  currentPeriodEnd    DateTime?
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  id        String            @id @default(cuid())
+  name      String
+  slug      String            @unique
+  logo      String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
-  members             WorkspaceMember[]
-  apiKeys             ApiKey[]
-  webhookEndpoints    WebhookEndpoint[]
-  auditLogs           AuditLog[]
+  members   WorkspaceMember[]
 }
 
 model WorkspaceMember {
   id          String    @id @default(cuid())
   workspaceId String
-  userId      String?
-  invitedEmail String?
+  userId      String
   role        Role      @default(MEMBER)
-  joinedAt    DateTime? @default(now())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([workspaceId, userId])
 }
-
-model ApiKey {
-  id          String    @id @default(cuid())
-  workspaceId String
-  name        String
-  keyHash     String    @unique
-  prefix      String
-  lastUsedAt  DateTime?
-  createdAt   DateTime  @default(now())
-
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-}
-
-model WebhookEvent {
-  id          String   @id @default(cuid())
-  eventId     String   @unique
-  eventType   String
-  payload     Json
-  processedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
-}
-
-enum WebhookDeliveryStatus {
-  PENDING
-  SUCCESS
-  FAILED
-}
-
-model WebhookEndpoint {
-  id          String            @id @default(cuid())
-  workspaceId String
-  url         String
-  description String?
-  secret      String            // e.g. "whsec_..."
-  events      String[]          // List of subscribed events, e.g. ["*"], ["member.invited"]
-  enabled     Boolean           @default(true)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-
-  workspace   Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  deliveries  WebhookDelivery[]
-}
-
-model WebhookDelivery {
-  id           String                @id @default(cuid())
-  endpointId   String
-  eventId      String
-  eventType    String
-  payload      Json
-  statusCode   Int?
-  responseBody String?               @db.Text
-  error        String?               @db.Text
-  durationMs   Int?
-  status       WebhookDeliveryStatus @default(PENDING)
-  attempts     Int                   @default(1)
-  createdAt    DateTime              @default(now())
-
-  endpoint     WebhookEndpoint       @relation(fields: [endpointId], references: [id], onDelete: Cascade)
-}
-
-model AuditLog {
-  id          String    @id @default(cuid())
-  workspaceId String
-  actorId     String?
-  actorEmail  String?
-  actorName   String?
-  action      String    // e.g. "member.invited", "apikey.created", "webhook.created", "billing.plan_updated"
-  resource    String    // e.g. "member", "apikey", "webhook", "billing", "workspace"
-  resourceId  String?
-  metadata    Json?     // diff or contextual payload
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime  @default(now())
-
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  actor       User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
-
-  @@index([workspaceId, createdAt])
-  @@index([workspaceId, action])
-  @@index([workspaceId, resource])
-}
-

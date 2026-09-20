@@ -35,6 +35,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - ⚡ **Next.js 16 (App Router & Turbopack)** with React 19
 - 🎨 **DevPreFlight Flat UI Component Kit** (`@devpreflight/ui-kit`)
 - 🔐 **Supabase Authentication Ready** (Email/Password, OAuth)
+- 🗄️ **Prisma 7 PostgreSQL Database Schema & Relationships**
 - 📱 **Mobile-First Responsive Layouts**
 - 🤖 **Cursor & Claude AI Rules** (`.cursorrules`, `CLAUDE.md`)
 
@@ -46,8 +47,9 @@ Upgrade to **NextLaunch Pro (Commercial Edition)** for:
 - 💳 **Stripe & Polar Multi-Provider Billing & Subscriptions**
 - 🧠 **Gemini AI Playground & Streaming LLM Workflows**
 - ✉️ **Resend Transactional Email Engine**
-- 🗄️ **Prisma 7 PostgreSQL Database Schema & Migrations**
-- 🛡️ **2FA Two-Factor Authentication & Audit Logging**
+- 🛡️ **2FA Two-Factor Authentication & Admin Impersonation**
+- 🪝 **Standard Outgoing HMAC Webhook Engine & Exponential Retries**
+- 📋 **Compliance Audit Event Logging & Streaming CSV/JSON Exports**
 - 🏢 **Multi-Tenant Team Workspaces & Permissions**
 
 👉 **Explore NextLaunch Pro**: [https://devpreflight.com/nextlaunch](https://devpreflight.com/nextlaunch)
