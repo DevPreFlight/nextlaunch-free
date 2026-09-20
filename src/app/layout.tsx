@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { CookieConsentBanner } from '@/components/preflight-ui/feedback';
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://nextlaunch.devpreflight.com';
 
@@ -73,6 +74,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900" suppressHydrationWarning>
         {children}
+        <CookieConsentBanner />
       </body>
     </html>
   );
