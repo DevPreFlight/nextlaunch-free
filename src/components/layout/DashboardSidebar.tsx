@@ -51,7 +51,19 @@ export function DashboardSidebar({ workspaceId }: SidebarProps) {
     });
   };
 
-  const navItems = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  exact?: boolean;
+  enabled?: boolean;
+  highlight?: boolean;
+  proBadge?: string;
+  isPaywalled?: boolean;
+  badge?: string;
+}
+
+  const navItems: NavItem[] = [
     {
       name: 'Overview',
       href: `/${workspaceId}`,
@@ -60,50 +72,15 @@ export function DashboardSidebar({ workspaceId }: SidebarProps) {
       enabled: true,
     },
     {
-      name: 'AI Copilot Studio',
-      href: `/${workspaceId}/ai-studio`,
-      icon: Bot,
-      proBadge: 'PRO',
-      enabled: FEATURES.enableAiStudio,
-    },
-    {
-      name: 'Analytics',
-      href: `/${workspaceId}/analytics`,
-      icon: BarChart3,
-      enabled: true,
-    },
-    {
       name: 'Team & Members',
       href: `/${workspaceId}/team`,
       icon: Users,
-      enabled: FEATURES.enableTeamWorkspaces,
-    },
-    {
-      name: 'Transactional Emails',
-      href: `/${workspaceId}/emails`,
-      icon: Mail,
-      badge: '5 Tmpl',
-      enabled: FEATURES.enableEmails,
+      enabled: true,
     },
     {
       name: 'Billing & Plans',
       href: `/${workspaceId}/billing`,
       icon: CreditCard,
-      enabled: true,
-    },
-    {
-      name: 'Security & Audit Logs',
-      href: `/${workspaceId}/audit-logs`,
-      icon: ShieldAlert,
-      isPaywalled: currentPlan !== 'enterprise',
-      badge: 'Enterprise',
-      enabled: FEATURES.enableAuditLogs,
-    },
-    {
-      name: 'UI Kit Gallery (60+)',
-      href: `/${workspaceId}/ui-showcase`,
-      icon: Layers,
-      highlight: true,
       enabled: true,
     },
     {

@@ -45,5 +45,6 @@ export async function demoLoginAction(): Promise<AuthResult> {
  */
 export async function logoutAction() {
   await authService.logout();
-  redirect('/login');
+  redirect('/');
 }
+

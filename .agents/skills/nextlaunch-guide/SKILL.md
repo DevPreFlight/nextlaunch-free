@@ -1,11 +1,11 @@
 ---
 name: nextlaunch-guide
-description: Complete full-stack SaaS development and AI agent playbook for NextLaunch Pro with Next.js 16, React 19, DevPreFlight Flat UI Kit, Prisma 7, Polar & Stripe payments, Gemini AI, and Resend emails.
+description: Complete full-stack SaaS development and AI agent playbook for NextLaunch Pro with Next.js 16, React 19, Prisma, Vitest backend testing, Outgoing Webhooks, Audit Logs, 2FA/TOTP security, DevPreFlight UI Kit, Polar & Stripe payments, Gemini AI, and senior craftsmanship standards.
 ---
 
 # NextLaunch Pro — AI Developer & Feature Playbook
 
-Use this skill when scaffolding new SaaS features, API routes, database models, payment gates, AI workflows, transactional emails, or customer portals in NextLaunch Pro.
+Use this skill when scaffolding SaaS features, API routes, database models, payment gates, outgoing webhooks, security audit logs, 2FA workflows, transactional emails, or custom UI screens in NextLaunch Pro.
 
 ---
 
@@ -14,45 +14,153 @@ Use this skill when scaffolding new SaaS features, API routes, database models, 
 ```text
 src/
 ├── app/
-│   ├── (auth)/                 # Zero-friction Cookie sessions & 1-Click Demo fast-track
-│   ├── (marketing)/            # High-converting Landing page, Pricing & MDX Blog
-│   ├── (dashboard)/[workspaceId]/ # Multi-tenant team workspace dashboards
-│   │   ├── overview/           # KPI cards, MRR, sparklines
-│   │   ├── analytics/          # Funnel & traffic metrics
-│   │   ├── team/               # RBAC seat management & member invitations
-│   │   ├── billing/            # Stripe / Polar subscription portal & invoices
-│   │   ├── ai-studio/          # Multi-LLM Copilot Studio with credit metering
-│   │   ├── ui-showcase/        # Live interactive gallery of 60+ UI components
-│   │   └── settings/           # Workspace profile & API keys
-│   ├── p/[slug]/               # Public customer-facing portals (feedback, roadmap, status)
-│   ├── admin/                  # Superadmin Backoffice with zero-password impersonation
+│   ├── page.tsx                # Clean, minimal developer status & service hub (zero-bloat entry)
+│   ├── layout.tsx              # Root HTML/Head layout with Outfit & JetBrains Mono typography
+│   ├── globals.css             # Tailwind CSS v4 design tokens and theme variables
 │   ├── actions/                # React 19 Server Actions ('use server')
-│   └── api/webhooks/           # Stripe & Polar webhook signature verification
+│   │   ├── auth.ts             # Passwordless / cookie session auth actions
+│   │   ├── billing.ts          # Stripe & Polar checkout / portal actions
+│   │   └── impersonate.ts      # Superadmin backoffice impersonation actions
+│   ├── admin/                  # Superadmin Backoffice & impersonation portal
+│   └── api/                    # RESTful programmatic endpoints
+│       ├── auth/2fa/           # 2FA setup, activation, and challenge verification
+│       ├── auth/sessions/      # Multi-device active sessions & session revocation
+│       ├── audit-logs/         # Enterprise audit logs query & CSV/JSON export
+│       ├── webhooks/outgoing/  # Outgoing Webhooks management & retry delivery
+│       ├── webhooks/polar/     # Inbound Polar subscription webhook handler
+│       ├── webhooks/stripe/    # Inbound Stripe checkout/subscription webhook handler
+│       ├── ai/chat/            # Gemini AI streaming endpoint
+│       └── emails/preview/     # Resend email template visual preview
 ├── components/
 │   ├── preflight-ui/           # 💎 DEVPREFLIGHT FLAT UI KIT (WCAG AAA Standalone Kit)
 │   │   ├── primitives/         # Button, TextInput, Textarea, SelectDropdown, ToggleSwitch, Chip, etc.
 │   │   ├── feedback/           # ModalDialog, SlideOverDrawer, AlertBanner, ToastNotification
 │   │   ├── commerce/           # PricingCard, PricingMatrix, PaywallGate, InvoicingReceiptCard
 │   │   └── types/              # Component design tokens & TypeScript definitions
-│   ├── dashboard/              # Workspace metrics, DataTables, FilterSearchBar, StatusBadge
-│   └── layout/                 # Sidebar, Navbar, Header, ImpersonationBanner
-├── services/                   # Decoupled business logic (Auth, Billing, Workspace, AI, Email)
-└── lib/
-    ├── db.ts                   # Prisma singleton client
-    ├── auth.ts                 # Session guards & RBAC permissions
-    └── payments/               # Unified payment adapters (Polar, Stripe, Midtrans)
+│   ├── dashboard/              # Metrics, DataTables, FilterSearchBar, StatusBadge
+│   └── layout/                 # Minimal layout primitives
+├── services/                   # Decoupled business logic
+│   ├── outgoing-webhook.service.ts # Webhook signing (v1 HMAC-SHA256), fan-out, & delivery retry
+│   ├── audit-log.service.ts    # Enterprise audit trail recording, filtering, & CSV/JSON export
+│   ├── two-factor.service.ts   # RFC 6238 TOTP engine & SHA-256 hashed recovery backup codes
+│   ├── session.service.ts      # Device user-agent classification & session revocation
+│   ├── api-key.service.ts      # Cryptographic SHA-256 API key hashing & prefix validation
+│   ├── auth.service.ts         # User provisioning & cookie session management
+│   ├── billing.service.ts      # Dual Stripe & Polar subscription sync
+│   ├── ai.service.ts           # Gemini GenAI copilot & token metering
+│   ├── email.service.ts        # Resend transactional email templates
+│   └── workspace.service.ts    # Multi-tenant workspace management
+├── lib/
+│   ├── db.ts                   # Prisma 6 singleton client (`prisma` / `db`)
+│   ├── auth.ts                 # Session guards & RBAC workspace permissions
+│   ├── ai/                     # Gemini AI SDK 2.x client
+│   └── payments/               # Unified payment adapters (Polar, Stripe, Midtrans)
+tests/
+└── unit/                       # Vitest backend unit test suites (100% test coverage)
+    ├── services/
+    │   ├── audit-log.test.ts
+    │   ├── two-factor.test.ts
+    │   ├── session.test.ts
+    │   ├── api-key.test.ts
+    │   ├── auth.test.ts
+    │   └── billing.test.ts
+    └── webhooks/
+        └── outgoing-webhook.test.ts
 ```
 
 ---
 
-## 💎 2. DevPreFlight Flat UI Component Kit
+## 💎 2. Core Backend Modules Cheat Sheet
 
-Always import UI components directly from `@/components/preflight-ui` or `@/components/dashboard`.
+NextLaunch Pro provides pure, zero-bloat, production-tested services that are **100% plug-and-play**:
 
-### Quick Component Cheat Sheet:
+### 1️⃣ Outgoing Webhooks System
+Allows customers to register webhook endpoints and receive signed event notifications (like Stripe/GitHub):
+```typescript
+import { OutgoingWebhookService } from '@/services';
+
+// Dispatch event across all subscribed endpoints in workspace:
+await OutgoingWebhookService.dispatchEvent(workspaceId, 'member.invited', {
+  memberId: 'mem_123',
+  email: 'colleague@company.com',
+  role: 'ADMIN',
+});
+```
+
+### 2️⃣ Enterprise Audit Logs & Activity Trail
+Records tamper-proof security audit logs with actor attribution, metadata diffs, and SIEM CSV/JSON exports:
+```typescript
+import { AuditLogService } from '@/services';
+
+await AuditLogService.record({
+  workspaceId,
+  action: 'apikey.created',
+  resource: 'apikey',
+  resourceId: apiKey.id,
+  actorId: user.id,
+  metadata: { name: 'Production Bot', prefix: apiKey.prefix },
+});
+```
+
+### 3️⃣ 2FA / TOTP Security & Session Management
+RFC 6238 TOTP authenticator engine + 8-digit hashed recovery backup codes:
+```typescript
+import { TwoFactorService, SessionService } from '@/services';
+
+// 1. Setup 2FA:
+const { secret, otpAuthUri } = await TwoFactorService.initiateSetup(userId);
+
+// 2. Verify login challenge (supports 6-digit TOTP or one-time backup recovery code):
+const result = await TwoFactorService.verifyLoginChallenge(userId, inputCode);
+
+// 3. Multi-device session manager:
+const sessions = await SessionService.listActiveSessions(userId, currentSessionToken);
+await SessionService.revokeOtherSessions(userId, currentSessionToken);
+```
+
+### 4️⃣ API Key Management
+Generates cryptographically secure API keys with SHA-256 database hashing (`nl_live_...`):
+```typescript
+import { ApiKeyService } from '@/services';
+
+// Generate key (raw key returned ONLY once to the user):
+const { apiKey, rawKey } = await ApiKeyService.createApiKey({ workspaceId, name: 'Prod API' });
+
+// Verify incoming API requests in route handlers:
+const verifiedKey = await ApiKeyService.verifyApiKey(rawKeyFromHeader);
+```
+
+### 5️⃣ Auth & RBAC Workspace Protection
+Protect Server Actions and Route Handlers:
+```typescript
+import { requireAuth, requireWorkspaceAccess } from '@/lib/auth';
+
+// Enforce active session
+const user = await requireAuth();
+
+// Enforce workspace member role ('OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER')
+const { user, role } = await requireWorkspaceAccess(workspaceId, ['OWNER', 'ADMIN']);
+```
+
+---
+
+## 🧪 3. Backend Unit Testing Protocol (Vitest)
+
+All backend logic, services, and API helpers must have unit tests.
+- Run tests: `npm test` or `npx vitest run`
+- Watch mode: `npm run test:watch`
+
+When creating a new service in `src/services/<name>.service.ts`, always create the matching test suite in `tests/unit/services/<name>.test.ts`.
+
+---
+
+## 🎨 4. UI Component Kit & Styling Standard
+
+NextLaunch Pro uses **Tailwind CSS v4** with the standalone **DevPreFlight Flat UI Kit** (`@/components/preflight-ui` and `@/components/dashboard`).
+
+### Key Primitives:
 ```typescript
 import {
-  // Primitives
   Button,
   LoadingButton,
   TextInput,
@@ -61,137 +169,32 @@ import {
   SelectDropdown,
   ToggleSwitch,
   Checkbox,
-  RadioGroup,
   Chip,
   Avatar,
-  Tooltip,
-  
-  // Feedback & Overlays
   ModalDialog,
   SlideOverDrawer,
   AlertBanner,
   ToastNotification,
-  
-  // Commerce & Monetization
   PricingCard,
-  PricingMatrix,
   PaywallGate,
-  PaywallModal,
-  DiscountCopyBar,
-  InvoicingReceiptCard,
 } from '@/components/preflight-ui';
 
 import {
   StatusBadge,
   MetricCard,
-  MetricSparklineCard,
-  QuickStatsBar,
   DataTable,
   FilterSearchBar,
 } from '@/components/dashboard';
 ```
 
-### Example: Modal Dialog with Form Inputs
-```tsx
-<ModalDialog
-  isOpen={isOpen}
-  onClose={() => setIsOpen(false)}
-  title="Create Resource"
-  description="Fill in the details to deploy your new service."
-  size="md"
-  footer={
-    <div className="flex justify-end gap-2">
-      <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>Cancel</Button>
-      <Button variant="primary" size="sm" onClick={handleSubmit}>Save Changes</Button>
-    </div>
-  }
->
-  <TextInput label="Resource Name" isRequired placeholder="e.g. Production Cluster" />
-  <SelectDropdown label="Region" options={[{ value: 'us-east', label: 'US East' }]} />
-  <Textarea label="Description" rows={3} />
-</ModalDialog>
-```
+### Styling Rules:
+- **Use Semantic Tokens**: Use CSS theme variables registered in `src/app/globals.css`.
+- ❌ **STRICTLY FORBIDDEN**: Inlining brittle arbitrary hex colors (`bg-[#1a2b3c]`). Use semantic utility classes.
+- **Micro-Interactions**: Add subtle hover and active feedback (`transition-all duration-150 active:scale-[0.98]`).
 
 ---
 
-## 🗄️ 3. Database Models & Prisma ORM
-
-### Convention:
-1. Define model in `prisma/schema.prisma`.
-2. Always relate to `Workspace` with `onDelete: Cascade`.
-3. Import `db` singleton from `@/lib/db`.
-
-```prisma
-model CustomFeature {
-  id          String    @id @default(cuid())
-  workspaceId String
-  title       String
-  status      String    @default("ACTIVE")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  @@index([workspaceId])
-}
-```
-
----
-
-## 🔐 4. Auth & RBAC Workspace Protection
-
-Protect Server Actions and Route Handlers using `@/lib/auth`:
-
-```typescript
-import { requireAuth, requireWorkspaceAccess } from '@/lib/auth';
-
-// 1. Require active session user
-export async function myUserAction() {
-  'use server';
-  const user = await requireAuth();
-  // ...
-}
-
-// 2. Require workspace member with specific role ('OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER')
-export async function updateWorkspaceSettingsAction(workspaceId: string, data: any) {
-  'use server';
-  const { user, role } = await requireWorkspaceAccess(workspaceId, ['OWNER', 'ADMIN']);
-  // Safe mutation logic...
-}
-```
-
----
-
-## 💳 5. Gating Features by Subscription Tier (Polar / Stripe)
-
-Gate premium functionality using the workspace plan:
-
-```typescript
-import { db } from '@/lib/db';
-
-export async function requireProPlan(workspaceId: string) {
-  const workspace = await db.workspace.findUnique({ where: { id: workspaceId } });
-  if (workspace?.plan !== 'pro' && workspace?.plan !== 'enterprise') {
-    throw new Error('Upgrade required: This feature is available on Pro plans');
-  }
-}
-```
-
-In UI components, wrap gated content with `<PaywallGate>`:
-```tsx
-<PaywallGate
-  isLocked={currentPlan === 'free'}
-  title="Export Data & Custom Domains"
-  description="Upgrade to Pro to unlock advanced reporting and custom SSL domains."
-  onUpgrade={() => router.push(`/${workspaceId}/billing`)}
->
-  <AdvancedReportTable data={reports} />
-</PaywallGate>
-```
-
----
-
-## 🤖 6. AI Studio & Gemini SDK Integration
+## 🤖 5. Gemini AI SDK 2.x Integration
 
 NextLaunch Pro includes `@google/genai` for multi-turn chat, streaming, and background prompt execution:
 
@@ -211,30 +214,21 @@ export async function generateContent(prompt: string) {
 
 ---
 
-## 📧 7. Transactional Emails (Resend + React Email)
+## 🗄️ 6. Database Migrations & Prisma 6
 
-Send responsive emails using `src/services/email.service.ts`:
-
-```typescript
-import { emailService } from '@/services/email.service';
-
-await emailService.sendNotificationEmail({
-  to: 'user@example.com',
-  subject: 'Your feature request was approved!',
-  title: 'Feature Status Update',
-  description: 'Your request "Figma Sync" has moved to In Progress.',
-  actionUrl: `https://yourapp.com/ws-demo/feedback`,
-  actionText: 'View on Roadmap',
-});
-```
+1. Edit or add models in `prisma/schema.prisma`.
+2. Always link workspace-scoped data to `Workspace` with `onDelete: Cascade`.
+3. Generate client: `npx prisma generate`.
+4. Push changes to database: `npx prisma db push`.
 
 ---
 
-## 🚀 8. Additive-Only Scaffolding Rule (Best Practice)
+## 🚀 7. Protocol for AI Agents Building New Features
 
-When creating new features for NextLaunch Pro:
-1. **Do not modify core auth or layout primitives**.
-2. **Add a new Service** in `src/services/<feature>.service.ts`.
-3. **Add React Server Actions** in `src/app/actions/<feature>.ts`.
-4. **Assemble Feature Components** in `src/components/<feature>/` leveraging `@/components/preflight-ui`.
-5. **Create Pages** under `src/app/(dashboard)/[workspaceId]/<feature>/page.tsx` and public portal `src/app/p/[slug]/page.tsx`.
+When an AI agent is asked to build a new feature or full SaaS app in this repository:
+1. **Zero Template Bloat**: Do not resurrect old unneeded marketing or demo simulator bars. Keep the codebase clean and fast.
+2. **Real Persistence First**: Always create real Prisma models in `prisma/schema.prisma` and execute real queries in `src/services/`—never rely on temporary in-memory dummy arrays.
+3. **Protect Mutations**: Secure server actions with `requireWorkspaceAccess(workspaceId, allowedRoles)`.
+4. **Log Sensitive Operations**: Record mutations in `AuditLogService.record(...)`.
+5. **Write Unit Tests**: Add corresponding test suites under `tests/unit/` and verify with `npm test`.
+6. **Compile Verification**: Always run `npx tsc --noEmit` and `npm run build` before completing the task.

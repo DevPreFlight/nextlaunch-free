@@ -25,17 +25,21 @@ enum SubscriptionStatus {
 }
 
 model User {
-  id            String            @id @default(cuid())
-  name          String?
-  email         String            @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id                  String            @id @default(cuid())
+  name                String?
+  email               String            @unique
+  emailVerified       DateTime?
+  image               String?
+  twoFactorEnabled    Boolean           @default(false)
+  twoFactorSecret     String?
+  twoFactorBackupCodes String[]         @default([])
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
-  memberships   WorkspaceMember[]
-  accounts      Account[]
-  sessions      Session[]
+  memberships         WorkspaceMember[]
+  accounts            Account[]
+  sessions            Session[]
+  auditLogs           AuditLog[]
 }
 
 model Account {
@@ -61,9 +65,14 @@ model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
+  ipAddress    String?
+  userAgent    String?
+  device       String?
+  lastActiveAt DateTime @default(now())
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 
 model Workspace {
   id                  String             @id @default(cuid())
@@ -82,6 +91,8 @@ model Workspace {
 
   members             WorkspaceMember[]
   apiKeys             ApiKey[]
+  webhookEndpoints    WebhookEndpoint[]
+  auditLogs           AuditLog[]
 }
 
 model WorkspaceMember {
@@ -120,3 +131,64 @@ model WebhookEvent {
   processedAt DateTime @default(now())
   createdAt   DateTime @default(now())
 }
+
+enum WebhookDeliveryStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model WebhookEndpoint {
+  id          String            @id @default(cuid())
+  workspaceId String
+  url         String
+  description String?
+  secret      String            // e.g. "whsec_..."
+  events      String[]          // List of subscribed events, e.g. ["*"], ["member.invited"]
+  enabled     Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deliveries  WebhookDelivery[]
+}
+
+model WebhookDelivery {
+  id           String                @id @default(cuid())
+  endpointId   String
+  eventId      String
+  eventType    String
+  payload      Json
+  statusCode   Int?
+  responseBody String?               @db.Text
+  error        String?               @db.Text
+  durationMs   Int?
+  status       WebhookDeliveryStatus @default(PENDING)
+  attempts     Int                   @default(1)
+  createdAt    DateTime              @default(now())
+
+  endpoint     WebhookEndpoint       @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  workspaceId String
+  actorId     String?
+  actorEmail  String?
+  actorName   String?
+  action      String    // e.g. "member.invited", "apikey.created", "webhook.created", "billing.plan_updated"
+  resource    String    // e.g. "member", "apikey", "webhook", "billing", "workspace"
+  resourceId  String?
+  metadata    Json?     // diff or contextual payload
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor       User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+  @@index([workspaceId, action])
+  @@index([workspaceId, resource])
+}
+

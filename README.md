@@ -1,26 +1,59 @@
-# 🚀 NextLaunch Free Community Starter
+# 🚀 NextLaunch Community Starter (MIT Edition)
 
-> **Open-Source Next.js 16 (App Router) & React 19 Starter Kit by DevPreFlight.**
+> **Free, open-source Next.js 16 & React 19 SaaS Starter Kit powered by @devpreflight/ui-kit Flat Design System, Supabase Auth, and Tailwind CSS.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3.5-black.svg)](https://nextjs.org)
 [![React 19](https://img.shields.io/badge/React-19.2.8-61dafb.svg)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict_100%25-3178c6.svg)](https://www.typescriptlang.org)
+[![Flat UI Kit](https://img.shields.io/badge/UI_Kit-@devpreflight/ui--kit-blue.svg)](https://devpreflight.com)
 
 ---
 
 ## ⚡ Quick Start
 
 ```bash
+# 1. Clone repository or use CLI
+npx @devpreflight/nextlaunch init my-saas-app --tier free
+
+# 2. Install dependencies
 npm install
+
+# 3. Configure environment variables
+cp .env.example .env.local
+
+# 4. Start local development
 npm run dev
 ```
 
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
 ---
 
-## 👑 Looking for AI Studio, Multi-Tenancy & 60+ UI Kit Components?
+## 🌟 Included in Free Community Edition
 
-Upgrade to **NextLaunch Pro**:
-- **Standard License ($99)**: Single project, full dual billing, multi-tenancy, and 60+ DevPreFlight Flat UI components.
-- **Agency License ($199)**: Unlimited client deliverables, Super Admin Panel with User Impersonation, AI Copilot Studio, and Priority Support.
+- ⚡ **Next.js 16 (App Router & Turbopack)** with React 19
+- 🎨 **DevPreFlight Flat UI Component Kit** (`@devpreflight/ui-kit`)
+- 🔐 **Supabase Authentication Ready** (Email/Password, OAuth)
+- 📱 **Mobile-First Responsive Layouts**
+- 🤖 **Cursor & Claude AI Rules** (`.cursorrules`, `CLAUDE.md`)
 
-👉 **[Get NextLaunch Pro on DevPreFlight](https://devpreflight.com)**
+---
+
+## 🚀 Need Full Multi-Billing & AI Capabilities?
+
+Upgrade to **NextLaunch Pro (Commercial Edition)** for:
+- 💳 **Stripe & Polar Multi-Provider Billing & Subscriptions**
+- 🧠 **Gemini AI Playground & Streaming LLM Workflows**
+- ✉️ **Resend Transactional Email Engine**
+- 🗄️ **Prisma 7 PostgreSQL Database Schema & Migrations**
+- 🛡️ **2FA Two-Factor Authentication & Audit Logging**
+- 🏢 **Multi-Tenant Team Workspaces & Permissions**
+
+👉 **Explore NextLaunch Pro**: [https://devpreflight.com/nextlaunch](https://devpreflight.com/nextlaunch)
+
+---
+
+## 📄 License
+
+Licensed under the [MIT License](LICENSE). © 2026 DevPreFlight Team.
